@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-19 20:51:58
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-19 22:41:54
+# @Last Modified time: 2017-04-20 00:53:17
 # This module will provide various methods to interface with the database. 
 #
 # There needs to be documentation somewhere, so I am taking the "how about here"
@@ -21,7 +21,7 @@
 # TODO: Create method to ACTUALLY ADD A DAMN TO DO ITEM
 import sqlite3
 
-FILE_NAME="todo.sqlite3"
+FILE_NAME="tda.sqlite3"
 # Per stackoverflow (Yeah, look, it is embarrassing that I said that) 
 # this is the best file extension for a sqlite3 file
 
@@ -54,6 +54,17 @@ def createTables(cursor):
 	# Depending on delete patterns, this could be bad.
 	# If you do use AutoIncrement
 	# though it will
-	cursor.execute("CREATE TABLE todo_items (" + 
-		"id INTEGER PRIMARY KEY, description text, " +
-		"created_date text, due_date text")
+	triggerStatement = """CREATE TRIGGER update_todoitem_updatetime BEFORE UPDATE ON "todo_items"
+	begin
+	update "todo_items" set updatetime = strftime('%Y-%m-%d %H:%M:%S:%s','now', 'localtime') where id = old.id;
+	end
+	"""
+	createStatement = """CREATE TABLE "todo_items" ( 
+		id INTEGER PRIMARY KEY,
+		description text,
+		created_date text DEFAULT (strftime('%Y-%m-%d %H:%M:%S:%s','now', 'localtime')),
+		updatetime text DEFAULT (strftime('%Y-%m-%d %H:%M:%S:%s','now', 'localtime')))
+	"""
+	cursor.execute(createStatement)
+	cursor.execute(triggerStatement)
+
