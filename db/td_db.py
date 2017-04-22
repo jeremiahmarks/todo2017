@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-19 20:51:58
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-22 14:39:22
+# @Last Modified time: 2017-04-22 15:11:32
 # This module will provide various methods to interface with the database. 
 #
 # There needs to be documentation somewhere, so I am taking the "how about here"
@@ -73,3 +73,13 @@ def addItemToTodo(cursor, itemToAdd):
 	cursor.execute(statement, (itemToAdd, ))
 	cursor.connection.commit()
 	return cursor.lastrowid
+
+def getTodoItems(cursor, numberToGet = None):
+	if numberToGet is None:
+		statement = "SELECT * FROM todo_items"
+	elif (0 <= numberToGet): 
+		statement = "SELECT * FROM todo_items LIMIT " + str(numberToGet)
+	else:
+		statement = "SELECT * FROM todo_items"
+	cursor.execute(statement)
+	return cursor.fetchall()
