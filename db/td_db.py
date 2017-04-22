@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-19 20:51:58
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-20 00:53:17
+# @Last Modified time: 2017-04-22 14:39:22
 # This module will provide various methods to interface with the database. 
 #
 # There needs to be documentation somewhere, so I am taking the "how about here"
@@ -68,3 +68,8 @@ def createTables(cursor):
 	cursor.execute(createStatement)
 	cursor.execute(triggerStatement)
 
+def addItemToTodo(cursor, itemToAdd):
+	statement = "INSERT INTO todo_items (description) VALUES (?)"
+	cursor.execute(statement, (itemToAdd, ))
+	cursor.connection.commit()
+	return cursor.lastrowid
