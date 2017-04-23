@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-22 15:22:45
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-22 19:28:59
+# @Last Modified time: 2017-04-22 19:33:12
 
 class TodoItem(object):
 	"""docstring for TodoItem"""
@@ -12,8 +12,8 @@ class TodoItem(object):
 		self.idnum = idnum
 		self.createdStamp = createdStamp
 		self.modifiedStamp = modifiedStamp
-		self.nameWidth = 80
-		self.defautWidth = 20
+		self.nameWidth = 15
+		self.defautWidth = 10
 
 	def __str__(self):
 		blockedName = []
@@ -25,8 +25,8 @@ class TodoItem(object):
 				blockedName.append(tempname[:])
 				tempname = ''
 			else:
-				blockedName.append(tempname[:nameWidth])
-				tempname =  tempname[nameWidth:]
+				blockedName.append(tempname[:self.nameWidth])
+				tempname =  tempname[self.nameWidth:]
 		retstr = "%04d|  " %(self.idnum, )
 		retstr = retstr + ''.join(blockedName[0])
 		retstr = retstr + "|  " +self.createdStamp
