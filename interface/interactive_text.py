@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-22 15:22:45
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-22 18:44:27
+# @Last Modified time: 2017-04-22 19:24:01
 
 class TodoItem(object):
 	"""docstring for TodoItem"""
@@ -37,6 +37,13 @@ class TodoList(object):
 	def __init__(self, dbinterface):
 		super(TodoList, self).__init__()
 		self.dbinterface = dbinterface
+		self.todoItems = []
+
+	def populateItems(self):
+		self.todoItems = []
+		for eachItem in self.dbinterface.getTodoItems():
+			self.todoItems.append(TodoItem(eachItem[0], eachItem[1], eachItem[2], eachItem[3]))
+
 		
 
 
