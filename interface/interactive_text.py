@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-22 15:22:45
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-22 19:26:59
+# @Last Modified time: 2017-04-22 19:28:59
 
 class TodoItem(object):
 	"""docstring for TodoItem"""
@@ -48,7 +48,10 @@ class TodoList(object):
 		self.populateItems()
 		for eachItem in self.todoItems:
 			print(eachItem)
-	
+
+	def addTodoItem(self, itemToAdd):
+		return self.dbinterface.addItemToTodo(itemToAdd)
+
 
 		
 
