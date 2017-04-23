@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-19 20:51:58
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-22 18:50:37
+# @Last Modified time: 2017-04-22 20:20:59
 # This module will provide various methods to interface with the database. 
 #
 # There needs to be documentation somewhere, so I am taking the "how about here"
@@ -35,18 +35,34 @@ def get_connection():
 def get_cursor(connection):
 	return connection.cursor()
 
+def get_db_version(cursor):
+	cursor.execute("PRAGMA user_version")
+	return int(cursor.fetchone()[0])
+
 def get_connection_cursor():
 	#Because you need them both to close things.
 	connection = get_connection()
 	cursor = get_cursor(connection)
-	cursor.execute("PRAGMA user_version")
-	if cursor.fetchone()[0] == 0:
-		cursor.execute("PRAGMA user_version = 1")
-		createTables(cursor)
+	currentDbVersion = get_db_version(cursor)
+	# Basically here we are see what version the data base is and then we can 
+	# reach appropriately. 
+
+	while currentDbVersion != DB_VERSION:
+
+		if currentDbVersion == 0:
+			# If it is currently zero that means that the data base has been created.
+			# Our first update is to create the basic todo_items table with its automatic
+			# update of the last modified column
+			upgradeToOne(cursor)
+			cursor.execute("PRAGMA user_version = 1")
+		if currentDbVersion == 1:
+			# TODO: write this to create the tables needed for tags and projects
+			pass
+
 
 	return connection, cursor
 
-def createTables(cursor):
+def upgradeToOne(cursor):
 	# In case like me, you did not know, sqlite treats
 	# any column with the type INTEGER PRIMARY KEY as 
 	# an alias to rowid. This means that there is a 
