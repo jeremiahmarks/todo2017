@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-22 15:22:45
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-22 18:38:00
+# @Last Modified time: 2017-04-22 18:44:27
 
 class TodoItem(object):
 	"""docstring for TodoItem"""
@@ -32,7 +32,12 @@ class TodoItem(object):
 		retstr = retstr + "|  " +self.createdStamp
 		return retstr
 
-
+class TodoList(object):
+	"""This holds and manages the TodoItems"""
+	def __init__(self, dbinterface):
+		super(TodoList, self).__init__()
+		self.dbinterface = dbinterface
+		
 
 
 
