@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-19 20:51:58
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-22 20:20:59
+# @Last Modified time: 2017-04-30 19:10:18
 # This module will provide various methods to interface with the database. 
 #
 # There needs to be documentation somewhere, so I am taking the "how about here"
@@ -83,4 +83,46 @@ def upgradeToOne(cursor):
 	"""
 	cursor.execute(createStatement)
 	cursor.execute(triggerStatement)
+	cursor.connection.commit()
 
+def upgradeToTwo(cursor):
+	# Where upgradeToOne simply created one database, 
+	# version two will include at least two tables, but
+	# definitely more. We will need one table for tag names
+	# and ids. Also, probably notes. We will need another
+	# table to record tag applications. 
+	triggerStatement1 = """CREATE TRIGGER delete_tag_applied AFTER DELETE ON "tag_names"
+	begin
+	DELETE from "tag_applications" WHERE tag_id = old.id;
+	end
+	"""
+	createStatement1 = """CREATE TABLE "tag_names" (
+		id INTEGER PRIMARY KEY,
+		name TEXT,
+		description TEXT);"""
+	createStatement2 = """CREATE TABLE "tag_applications" (
+		id INTEGER PRIMARY KEY,
+		tag_id INTEGER,
+		todo_id INTEGER,
+		FOREIGN KEY (tag_id) REFERENCES tag_names(id), 
+		FOREIGN KEY (todo_id) REFERENCES todo_items(id));"""
+	cursor.execute(createStatement1)
+	cursor.execute(createStatement2)
+	cursor.execute(triggerStatement1)
+	cursor.connection.commit()
+
+def revertToOne(cursor):
+	# Basically should currently only be used
+	# for testing, this creates a way to upgrade
+	# to two a second time
+	deleteStatement1 = "DROP TABLE tag_names;"
+	deleteStatement2 = "DROP TABLE tag_applications;"
+	try:
+		cursor.execute(deleteStatement1)
+	except Exception:
+		print (str(Exception))
+	try:
+		cursor.execute(deleteStatement2)
+	except Exception:
+		print (str(Exception))
+	cursor.connection.commit()
