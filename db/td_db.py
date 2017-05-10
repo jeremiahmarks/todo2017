@@ -2,7 +2,7 @@
 # @Author: Jeremiah
 # @Date:   2017-04-19 20:51:58
 # @Last Modified by:   Jeremiah Marks
-# @Last Modified time: 2017-04-30 19:10:18
+# @Last Modified time: 2017-05-09 21:22:46
 # This module will provide various methods to interface with the database. 
 #
 # There needs to be documentation somewhere, so I am taking the "how about here"
@@ -57,7 +57,13 @@ def get_connection_cursor():
 			cursor.execute("PRAGMA user_version = 1")
 		if currentDbVersion == 1:
 			# TODO: write this to create the tables needed for tags and projects
+			upgradeToTwo(cursor)
+			cursor.execute("PRAGMA user_version = 2")
+		if currentDbVersion == 2:
 			pass
+		if currentDbVersion == 3:
+			revertToOne(cursor)
+			cursor.execute("PRAGMA user_version = 1")
 
 
 	return connection, cursor
@@ -75,7 +81,7 @@ def upgradeToOne(cursor):
 	update "todo_items" set updatetime = strftime('%Y-%m-%d %H:%M:%S:%s','now', 'localtime') where id = old.id;
 	end
 	"""
-	createStatement = """CREATE TABLE "todo_items" ( 
+	createStatement = """CREATE TABLE IF NOT EXISTS "todo_items" ( 
 		id INTEGER PRIMARY KEY,
 		description text,
 		created_date text DEFAULT (strftime('%Y-%m-%d %H:%M:%S:%s','now', 'localtime')),
@@ -126,3 +132,15 @@ def revertToOne(cursor):
 	except Exception:
 		print (str(Exception))
 	cursor.connection.commit()
+
+def upgradeToFour(cursor):
+	# I need a place to track completed items
+	createStatement = """CREATE TABLE completed_items (
+		id INTEGER PRIMARY KEY,
+		original_id INTEGER,
+		name TEXT,
+		description text,
+		created_date text DEFAULT (strftime('%Y-%m-%d %H:%M:%S:%s','now', 'localtime')),
+		updatetime text DEFAULT (strftime('%Y-%m-%d %H:%M:%S:%s','now', 'localtime')))"""
+	cursor.execute(createStatement)
+
